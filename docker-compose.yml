@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    container_name: one_final_db
+    restart: always
+    ports:
+      - 2345:5432
+    environment:
+      - POSTGRES_DB=one_final
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - one_network
+
+  migration:
+    image: migrate/migrate
+    container_name: one_final_migrate
+    command: "-path=/migrations -database=postgres://postgres:${DB_PASSWORD}@db/$one_final?sslmode=disable up"
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    volumes:
+      - ./migrations:/migrations
+    networks:
+      - one_network
+
+  app:
+    container_name: one_final_app
+    build: .
+    command: ["./main"]
+    ports:
+      - 8080:8080
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+      - AUTH_KEY=${AUTH_KEY}
+    depends_on:
+      - db
+    networks:
+      - one_network
+
+volumes:
+  db-data:
+
+networks:
+  one_network:
+    driver: bridge

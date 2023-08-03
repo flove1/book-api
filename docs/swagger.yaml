@@ -1,0 +1,696 @@
+basePath: /api/v1
+definitions:
+  api.CreateBookRequest:
+    properties:
+      author:
+        example: Robert W. Chambers
+        maxLength: 100
+        minLength: 5
+        type: string
+      description:
+        example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
+        type: string
+      tags:
+        example:
+        - horror
+        - mystery
+        items:
+          type: string
+        maxItems: 5
+        minItems: 1
+        type: array
+      title:
+        example: The King in Yellow
+        maxLength: 100
+        minLength: 5
+        type: string
+    required:
+    - author
+    - description
+    - tags
+    - title
+    type: object
+  api.CreateReviewRequest:
+    properties:
+      book_id:
+        example: 1
+        type: integer
+      content:
+        example: Awesome book
+        type: string
+      rating:
+        default: 0
+        example: 100
+        type: integer
+    required:
+    - content
+    - rating
+    type: object
+  api.CreateUserRequest:
+    properties:
+      email:
+        example: example@gmail.com
+        type: string
+      first_name:
+        example: John
+        maxLength: 50
+        minLength: 2
+        type: string
+      last_name:
+        example: Snow
+        maxLength: 50
+        minLength: 2
+        type: string
+      password:
+        example: password
+        maxLength: 32
+        minLength: 6
+        type: string
+      username:
+        example: username
+        maxLength: 50
+        minLength: 5
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - username
+    type: object
+  api.DefaultResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  api.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  api.GetBookByIDResponse:
+    properties:
+      body:
+        $ref: '#/definitions/entity.Book'
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  api.GetBooksResponse:
+    properties:
+      body:
+        items:
+          $ref: '#/definitions/entity.Book'
+        type: array
+      code:
+        type: integer
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/util.Metadata'
+    type: object
+  api.GetReviewsByBookIDResponse:
+    properties:
+      body:
+        items:
+          $ref: '#/definitions/entity.Review'
+        type: array
+      code:
+        type: integer
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/util.Metadata'
+    type: object
+  api.LoginRequest:
+    properties:
+      credentials:
+        description: Can be username or email
+        example: username
+        type: string
+      password:
+        example: password
+        type: string
+    required:
+    - credentials
+    - password
+    type: object
+  api.LoginResponse:
+    properties:
+      body:
+        $ref: '#/definitions/entity.Token'
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  api.UpdateBookRequest:
+    properties:
+      author:
+        example: Robert W. Chambers
+        maxLength: 100
+        minLength: 5
+        type: string
+      description:
+        example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua.
+        type: string
+      tags:
+        example:
+        - horror
+        - mystery
+        items:
+          type: string
+        maxItems: 5
+        minItems: 1
+        type: array
+      title:
+        example: The King in Yellow
+        maxLength: 100
+        minLength: 5
+        type: string
+    type: object
+  api.UpdateReviewRequest:
+    properties:
+      content:
+        example: Awesome book
+        type: string
+      rating:
+        default: 0
+        example: 100
+        type: integer
+    type: object
+  entity.Book:
+    properties:
+      author:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      rating:
+        type: number
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.Review:
+    properties:
+      book_id:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      rating:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  entity.Token:
+    properties:
+      expiry:
+        type: string
+      token:
+        type: string
+    type: object
+  util.Metadata:
+    properties:
+      current_page:
+        type: integer
+      first_page:
+        type: integer
+      last_page:
+        type: integer
+      page_size:
+        type: integer
+      totalRecords:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: dragon090986@gmail.com
+    name: Kirill Shaforostov
+  description: API for Library application
+  title: Library API
+  version: 0.0.1
+paths:
+  /books:
+    get:
+      parameters:
+      - default: 1
+        in: query
+        name: page
+        type: integer
+      - default: 50
+        description: Number of books inside of one page. Can range between 1-100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - default: created_at
+        description: The field that is used for sorting. Add prefix "-" to change
+          direction
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.GetBooksResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get books using pagination
+      tags:
+      - Books
+  /books/{id}:
+    get:
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book info
+          schema:
+            $ref: '#/definitions/api.GetBookByIDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get book by id
+      tags:
+      - Books
+  /books/{id}/reviews:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - default: 1
+        in: query
+        name: page
+        type: integer
+      - default: 50
+        description: Number of books inside of one page. Can range between 1-100
+        in: query
+        maximum: 100
+        minimum: 1
+        name: page_size
+        type: integer
+      - default: created_at
+        description: The field that is used for sorting. Add prefix "-" to change
+          direction
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reviews info
+          schema:
+            $ref: '#/definitions/api.GetReviewsByBookIDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Get reviews by book ID using pagination
+      tags:
+      - Books
+  /books/delete/{id}:
+    delete:
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete book by ID. Requires MODERATOR role or higher
+      tags:
+      - Books
+  /books/new:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CreateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Book succesfully created
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create new book. Requires MODERATOR role or higher
+      tags:
+      - Books
+  /books/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book succesfully updated
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update book by id. Requires MODERATOR role or higher
+      tags:
+      - Books
+  /reviews/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete review by ID
+      tags:
+      - Reviews
+  /reviews/new:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Review succesfully created
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create new review
+      tags:
+      - Reviews
+  /reviews/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update review by ID
+      tags:
+      - Reviews
+  /user/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user succesfully deleted
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user
+      tags:
+      - Users
+  /user/delete/{id}:
+    delete:
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user succesfully deleted
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user by his ID. Requires MODERATOR role or higher
+      tags:
+      - Users
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: token succesfully created
+          schema:
+            $ref: '#/definitions/api.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Authenticated user and return access token
+      tags:
+      - Authentication
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User succesfully created
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Register new user
+      tags:
+      - Users
+  /user/update:
+    patch:
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: token succesfully created
+          schema:
+            $ref: '#/definitions/api.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user info
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
