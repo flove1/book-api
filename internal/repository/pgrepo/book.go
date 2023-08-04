@@ -7,6 +7,7 @@ import (
 	"one-lab-final/internal/entity"
 	"one-lab-final/internal/repository"
 	"one-lab-final/pkg/util"
+	"strings"
 	"time"
 )
 
@@ -42,30 +43,35 @@ func (p *Postgres) GetBookByID(ctx context.Context, bookID int64) (*entity.Book,
 			b.year,
 			b.created_at,
 			b.updated_at,
-			(SELECT rating FROM %[2]s r WHERE r.book_id = b.id)
+			COALESCE((SELECT rating FROM %[2]s r WHERE r.book_id = b.id), 0) AS rating
 		FROM %[1]s b
 		WHERE 
 			b.id = $1
 	`, booksTable, booksAvgRatingView)
 
-	book := new(entity.Book)
+	book := entity.Book{}
 
+	tags := ""
 	err := p.Pool.QueryRow(ctx, query, bookID).Scan(
 		&book.ID,
 		&book.Title,
 		&book.Description,
 		&book.Author,
-		&book.Tags,
+		&tags,
 		&book.Year,
 		&book.CreatedAt,
 		&book.UpdatedAt,
+
 		&book.Rating,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return book, nil
+	tagsArray := strings.Split(tags[1:len(tags)-1], ",")
+	book.Tags = &tagsArray
+
+	return &book, nil
 }
 
 func (p *Postgres) GetBooks(ctx context.Context, title *string, author *string, tags *[]string, filter util.Filter) ([]*entity.Book, *util.Metadata, error) {
@@ -126,17 +132,20 @@ func (p *Postgres) GetBooks(ctx context.Context, title *string, author *string, 
 
 	for rows.Next() {
 		var book entity.Book
+		tags := ""
 		rows.Scan(
 			&book.ID,
 			&book.Title,
 			&book.Description,
 			&book.Author,
-			&book.Tags,
+			&tags,
 			&book.Year,
 			&book.CreatedAt,
 			&book.UpdatedAt,
 			&book.Rating,
 		)
+		tagsArray := strings.Split(tags[1:len(tags)-1], ",")
+		book.Tags = &tagsArray
 
 		books = append(books, &book)
 	}

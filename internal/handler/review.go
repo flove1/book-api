@@ -37,12 +37,14 @@ func (h *Handler) createReview(ctx *gin.Context) {
 
 	req.UserID = ctx.MustGet("userID").(int64)
 
-	err = h.Services.CreateReview(ctx, &entity.Review{
+	review := &entity.Review{
 		Content: &req.Content,
 		Rating:  &req.Rating,
 		UserID:  req.UserID,
 		BookID:  req.BookID,
-	})
+	}
+
+	err = h.Services.CreateReview(ctx, review)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
@@ -51,6 +53,8 @@ func (h *Handler) createReview(ctx *gin.Context) {
 		})
 		return
 	}
+
+	ctx.Header("Locations", fmt.Sprintf("/reviews/%d", review.ID))
 
 	ctx.JSON(http.StatusCreated, &api.DefaultResponse{
 		Code:    http.StatusCreated,
@@ -62,6 +66,7 @@ func (h *Handler) createReview(ctx *gin.Context) {
 // @Tags         Books
 // @Accept       json
 // @Produce      json
+// @Param        id   path      int  true  "Book ID"
 // @Param filter  query api.Filter true "Pagination filter"
 //
 // @Success      200 {object} api.GetReviewsByBookIDResponse "Reviews info"

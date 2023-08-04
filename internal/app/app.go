@@ -97,11 +97,6 @@ func Run(cfg *config.Config) error {
 		log.Printf("server notify: %s", err.Error())
 	}
 
-	err = services.DeleteUser(context.Background(), admin.ID)
-	if err != nil {
-		log.Print("error while deleting admin user: ", err.Error())
-	}
-
 	err = server.Shutdown()
 	if err != nil {
 		log.Printf("server shutdown err: %s", err)

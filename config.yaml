@@ -6,7 +6,7 @@ http:
   write_timeout: '60s'
 
 db:
-  host: 'db'
+  host: 'localhost'
   port: '5432'
   db_name: 'one_final'
   username: 'postgres'

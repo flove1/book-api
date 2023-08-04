@@ -44,7 +44,7 @@ func (p *Postgres) GetUserByUsername(ctx context.Context, username string) (*ent
 				email,
 				first_name,
 				last_name,
-				created_at,
+				created_at
 			FROM %s
 			WHERE 
 				username = $1

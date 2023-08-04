@@ -156,9 +156,9 @@ func (h *Handler) login(ctx *gin.Context) {
 // @Tags         Users
 // @Produce      json
 // @Security ApiKeyAuth
-// @Param data body api.LoginRequest true "Request body"
+// @Param data body api.UpdateUserRequest true "Request body"
 //
-// @Success      200 {object} api.LoginResponse "User succesfully updated"
+// @Success      200 {object} api.DefaultResponse "User succesfully updated"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
 // @Router       /users/update [patch]

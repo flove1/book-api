@@ -251,6 +251,24 @@ definitions:
         example: Bad behaviour
         type: string
     type: object
+  api.UpdateUserRequest:
+    properties:
+      first_name:
+        example: John
+        maxLength: 50
+        minLength: 2
+        type: string
+      last_name:
+        example: Snow
+        maxLength: 50
+        minLength: 2
+        type: string
+      password:
+        example: password
+        maxLength: 32
+        minLength: 6
+        type: string
+    type: object
   entity.Book:
     properties:
       author:
@@ -425,8 +443,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
       summary: Get book by id
       tags:
       - Books
@@ -435,6 +451,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
       - default: 1
         in: query
         name: page
@@ -937,14 +958,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/api.LoginRequest'
+          $ref: '#/definitions/api.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: User succesfully updated
           schema:
-            $ref: '#/definitions/api.LoginResponse'
+            $ref: '#/definitions/api.DefaultResponse'
         "400":
           description: Bad Request
           schema:

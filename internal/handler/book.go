@@ -80,7 +80,6 @@ func (h *Handler) createBook(ctx *gin.Context) {
 // @Summary      Get book by id
 // @Tags         Books
 // @Produce      json
-// @Security ApiKeyAuth
 // @Param        id   path      int  true  "Book ID"
 //
 // @Success      200 {object} api.GetBookByIDResponse "Book info"

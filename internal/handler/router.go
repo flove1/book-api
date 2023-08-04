@@ -28,7 +28,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 	userV1.POST("/register", h.createUser)
 	userV1.POST("/login", h.login)
 	userV1.PATCH("/update", h.requireAuthenticatedUser(), h.updateUser)
-	userV1.PATCH("/delete", h.requireAuthenticatedUser(), h.deleteUser)
+	userV1.DELETE("/delete", h.requireAuthenticatedUser(), h.deleteUser)
 
 	bookV1.GET("", h.getBooks)
 	bookV1.GET("/:id", h.getBookByID)
