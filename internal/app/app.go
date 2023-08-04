@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"one-lab-final/internal/config"
+	"one-lab-final/internal/entity"
 	"one-lab-final/internal/handler"
 	"one-lab-final/internal/repository/pgrepo"
 	"one-lab-final/internal/service"
@@ -30,7 +31,7 @@ func Run(cfg *config.Config) error {
 
 	log.Println("connection success")
 
-	repo := pgrepo.New(db)
+	repo := pgrepo.New(db, cfg)
 	services := service.New(repo, cfg)
 	handler := handler.New(services, cfg)
 	server := httpserver.New(
@@ -62,6 +63,27 @@ func Run(cfg *config.Config) error {
 		return err
 	}
 
+	//Create or update admin user
+	admin, err := services.GetUserByCredentials(context.Background(), cfg.ADMIN.Username)
+	if err != nil {
+		admin = &entity.User{
+			Username:  &cfg.ADMIN.Username,
+			Email:     &cfg.ADMIN.Email,
+			FirstName: &cfg.ADMIN.FirstName,
+			LastName:  &cfg.ADMIN.LastName,
+			Password: entity.Password{
+				Plaintext: &cfg.ADMIN.Password,
+			},
+			Role: entity.ADMIN,
+		}
+		log.Print("admin user does not exists, creating new one...")
+		err = services.CreateUser(context.Background(), admin)
+
+	} else {
+		log.Print("admin user exists, updating info...")
+		services.UpdateUser(context.Background(), admin)
+	}
+
 	server.Start()
 	log.Println("server started")
 
@@ -73,6 +95,11 @@ func Run(cfg *config.Config) error {
 		log.Printf("signal received: %s", s.String())
 	case err = <-server.Notify():
 		log.Printf("server notify: %s", err.Error())
+	}
+
+	err = services.DeleteUser(context.Background(), admin.ID)
+	if err != nil {
+		log.Print("error while deleting admin user: ", err.Error())
 	}
 
 	err = server.Shutdown()

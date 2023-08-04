@@ -210,6 +210,32 @@ func (_m *Service) GetReviewsByBookID(ctx context.Context, bookID int64, filter 
 	return r0, r1, r2
 }
 
+// GetUserByCredentials provides a mock function with given fields: ctx, username
+func (_m *Service) GetUserByCredentials(ctx context.Context, username string) (*entity.User, error) {
+	ret := _m.Called(ctx, username)
+
+	var r0 *entity.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*entity.User, error)); ok {
+		return rf(ctx, username)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *entity.User); ok {
+		r0 = rf(ctx, username)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entity.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, username)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUserByToken provides a mock function with given fields: ctx, token
 func (_m *Service) GetUserByToken(ctx context.Context, token string) (*entity.User, error) {
 	ret := _m.Called(ctx, token)

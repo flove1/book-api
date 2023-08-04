@@ -148,7 +148,7 @@ func TestLogin(t *testing.T) {
 			MockError:           util.ErrMismatchedPassword,
 			ExpectedCredentials: "flove",
 			ExpectedPassword:    "password",
-			ExpectedCode:        http.StatusBadRequest,
+			ExpectedCode:        http.StatusUnauthorized,
 		},
 		{
 			Name: "Error while saving entity",

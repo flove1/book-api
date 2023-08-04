@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	HTTP ServerConfig `yaml:"http"`
-	DB   DBConfig     `yaml:"db"`
-	AUTH AuthConfig   `yaml:"auth"`
+	HTTP  ServerConfig `yaml:"http"`
+	DB    DBConfig     `yaml:"db"`
+	AUTH  AuthConfig   `yaml:"auth"`
+	ADMIN AdminConfig  `yaml:"admin"`
 }
 
 type ServerConfig struct {
@@ -31,6 +32,14 @@ type DBConfig struct {
 	DBName   string `yaml:"db_name"`
 	Username string `yaml:"username"`
 	Password string `env:"DB_PASSWORD" env-required:"true"`
+}
+
+type AdminConfig struct {
+	Username  string `yaml:"username"`
+	Email     string `yaml:"email"`
+	FirstName string `yaml:"first_name"`
+	LastName  string `yaml:"lasr_name"`
+	Password  string `env:"ADMIN_PASSWORD" env-required:"true"`
 }
 
 func ParseConfig(path string) (*Config, error) {

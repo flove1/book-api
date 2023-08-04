@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 	first_name text NOT NULL,
 	last_name text NOT NULL,
 	password_hash bytea NOT NULL,
-    role role NOT NULL DEFAULT 'USER'
+    role role NOT NULL DEFAULT 'USER',
+    created_at timestamp(0) with time zone NOT NULL DEFAULT NOW(),
+    updated_at  timestamp(0) with time zone NOT NULL DEFAULT NOW()
 );

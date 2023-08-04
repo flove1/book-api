@@ -1,6 +1,8 @@
 package pgrepo
 
 import (
+	"one-lab-final/internal/config"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -14,11 +16,15 @@ const (
 )
 
 type Postgres struct {
-	Pool *pgxpool.Pool
+	Pool   *pgxpool.Pool
+	Config *config.Config
 }
 
-func New(pool *pgxpool.Pool) *Postgres {
-	return &Postgres{pool}
+func New(pool *pgxpool.Pool, config *config.Config) *Postgres {
+	return &Postgres{
+		Pool:   pool,
+		Config: config,
+	}
 }
 
 func (p *Postgres) Close() {

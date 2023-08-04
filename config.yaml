@@ -6,10 +6,16 @@ http:
   write_timeout: '60s'
 
 db:
-  host: 'db'
+  host: 'localhost'
   port: '5432'
   db_name: 'one_final'
   username: 'postgres'
 
 auth:
   token_expiration: '24h'
+
+admin:
+  username: 'admin'
+  email: 'admin@example.com'
+  first_name: 'Admin'
+  lasr_name: 'Admin'

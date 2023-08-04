@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"one-lab-final/internal/entity"
 	"one-lab-final/internal/handler/api"
+	"one-lab-final/internal/repository"
 	"one-lab-final/pkg/util"
 
 	"github.com/gin-gonic/gin"
 )
-
-// var passwordRegEx = regexp.MustCompile(`^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$`)
 
 // @Summary      Register new user
 // @Tags         Users
@@ -33,13 +32,6 @@ func (h *Handler) createUser(ctx *gin.Context) {
 		})
 		return
 	}
-
-	// if !passwordRegEx.Match([]byte(req.Password)) {
-	// 	ctx.JSON(http.StatusBadRequest, &ErrorResponse{
-	// 		http.StatusBadRequest,
-	// 		"password is not strong enough",
-	// 	})
-	// }
 
 	err = h.Services.CreateUser(ctx, &entity.User{
 		Username:  &req.Username,
@@ -70,7 +62,7 @@ func (h *Handler) createUser(ctx *gin.Context) {
 // @Produce      json
 // @Param data body api.LoginRequest true "Request body"
 //
-// @Success      201 {object} api.LoginResponse "token succesfully created"
+// @Success      201 {object} api.LoginResponse "Token succesfully created"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
 // @Router       /user/login [post]
@@ -89,10 +81,10 @@ func (h *Handler) login(ctx *gin.Context) {
 	token, err := h.Services.Login(ctx, req.Credentials, req.Password)
 	if err != nil {
 		switch {
-		case errors.Is(err, util.ErrMismatchedPassword):
-			ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
-				Code:    http.StatusBadRequest,
-				Message: err.Error(),
+		case errors.Is(err, util.ErrMismatchedPassword) || errors.Is(err, repository.ErrRecordNotFound):
+			ctx.JSON(http.StatusUnauthorized, &api.ErrorResponse{
+				Code:    http.StatusUnauthorized,
+				Message: "user does not exists or password does not match",
 			})
 			return
 		default:
@@ -117,7 +109,7 @@ func (h *Handler) login(ctx *gin.Context) {
 // @Security ApiKeyAuth
 // @Param data body api.LoginRequest true "Request body"
 //
-// @Success      201 {object} api.LoginResponse "token succesfully created"
+// @Success      201 {object} api.LoginResponse "User succesfully updated"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
 // @Router       /user/update [patch]
@@ -132,13 +124,6 @@ func (h *Handler) updateUser(ctx *gin.Context) {
 		})
 		return
 	}
-
-	// if !passwordRegEx.Match([]byte(req.Password)) {
-	// 	ctx.JSON(http.StatusBadRequest, &ErrorResponse{
-	// 		http.StatusBadRequest,
-	// 		"password is not strong enough",
-	// 	})
-	// }
 
 	userID := ctx.MustGet("userID").(int64)
 
@@ -169,7 +154,7 @@ func (h *Handler) updateUser(ctx *gin.Context) {
 // @Produce      json
 // @Security ApiKeyAuth
 //
-// @Success      200 {object} api.DefaultResponse "user succesfully deleted"
+// @Success      200 {object} api.DefaultResponse "User succesfully deleted"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
 // @Router       /user/delete [delete]

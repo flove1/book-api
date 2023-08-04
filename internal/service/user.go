@@ -22,6 +22,14 @@ func (m *Manager) CreateUser(ctx context.Context, u *entity.User) error {
 	return nil
 }
 
+func (m *Manager) GetUserByCredentials(ctx context.Context, username string) (*entity.User, error) {
+	user, err := m.Repository.GetUserByCredentials(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
+}
+
 func (m *Manager) GetUserByToken(ctx context.Context, token string) (*entity.User, error) {
 	user, err := m.Repository.GetUserByToken(ctx, token)
 	if err != nil {
