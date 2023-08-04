@@ -12,7 +12,7 @@ import (
 // @Produce      json
 //
 // @Success      200 {object} api.DefaultResponse
-// @Failure      400  {object}  api.ErrorResponse
+// @Failure      494  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
 // @Router       /healthcheck [get]
 func (h *Handler) healthcheck(ctx *gin.Context) {

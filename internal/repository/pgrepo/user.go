@@ -35,6 +35,42 @@ func (p *Postgres) CreateUser(ctx context.Context, u *entity.User) error {
 	return nil
 }
 
+func (p *Postgres) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
+	query := fmt.Sprintf(`
+			SELECT 
+				id,
+				username,
+				email,
+				first_name,
+				last_name,
+				created_at
+			FROM %s
+			WHERE 
+				username = $1
+			`, usersTable)
+
+	user := &entity.User{}
+
+	err := p.Pool.QueryRow(ctx, query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.FirstName,
+		&user.LastName,
+		&user.CreatedAt,
+	)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return nil, repository.ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return user, nil
+}
+
 func (p *Postgres) GetUserByCredentials(ctx context.Context, credentials string) (*entity.User, error) {
 	query := fmt.Sprintf(`
 			SELECT 

@@ -22,8 +22,16 @@ func (m *Manager) CreateUser(ctx context.Context, u *entity.User) error {
 	return nil
 }
 
-func (m *Manager) GetUserByCredentials(ctx context.Context, username string) (*entity.User, error) {
-	user, err := m.Repository.GetUserByCredentials(ctx, username)
+func (m *Manager) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
+	user, err := m.Repository.GetUserByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+	return user, err
+}
+
+func (m *Manager) GetUserByCredentials(ctx context.Context, credentials string) (*entity.User, error) {
+	user, err := m.Repository.GetUserByCredentials(ctx, credentials)
 	if err != nil {
 		return nil, err
 	}

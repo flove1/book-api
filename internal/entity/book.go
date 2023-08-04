@@ -9,6 +9,7 @@ type Book struct {
 	Author      *string   `json:"author" db:"author"`
 	Tags        *[]string `json:"tags" db:"tags"`
 	Rating      float32   `json:"rating"`
+	Year        int64     `json:"year"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
 }

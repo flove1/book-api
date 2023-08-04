@@ -16,13 +16,14 @@ func (p *Postgres) CreateBook(ctx context.Context, book *entity.Book) error {
 			title,
 			author,
 			description,
-			tags
+			tags,
+			year
 		)
-		VALUES ($1, $2, $3, $4)
+		VALUES ($1, $2, $3, $4, $5)
 		RETURNING id
 		`, booksTable)
 
-	err := p.Pool.QueryRow(ctx, query, book.Title, book.Author, book.Description, book.Tags).Scan(&book.ID)
+	err := p.Pool.QueryRow(ctx, query, book.Title, book.Author, book.Description, book.Tags, book.Year).Scan(&book.ID)
 	if err != nil {
 		return err
 	}
@@ -84,6 +85,7 @@ func (p *Postgres) GetBooks(ctx context.Context, title *string, author *string, 
 			b.description,
 			b.author,
 			b.tags,
+			b.year,
 			b.created_at,
 			b.updated_at,
 			COALESCE((SELECT avg(rating) FROM %[2]s r WHERE r.book_id = b.id), 0) AS rating
@@ -128,6 +130,7 @@ func (p *Postgres) GetBooks(ctx context.Context, title *string, author *string, 
 			&book.Description,
 			&book.Author,
 			&book.Tags,
+			&book.Year,
 			&book.CreatedAt,
 			&book.UpdatedAt,
 			&book.Rating,

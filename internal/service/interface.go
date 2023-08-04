@@ -9,7 +9,8 @@ import (
 type Service interface {
 	CreateUser(ctx context.Context, user *entity.User) error
 	GetUserByToken(ctx context.Context, token string) (*entity.User, error)
-	GetUserByCredentials(ctx context.Context, username string) (*entity.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*entity.User, error)
+	GetUserByCredentials(ctx context.Context, credentials string) (*entity.User, error)
 	UpdateUser(ctx context.Context, user *entity.User) error
 	DeleteUser(ctx context.Context, id int64) error
 

@@ -30,6 +30,7 @@ func (m *Manager) GetBooks(ctx context.Context, title *string, author *string, t
 		"author",
 		"description",
 		"rating",
+		"year",
 		"created_at",
 		"updated_at"}
 

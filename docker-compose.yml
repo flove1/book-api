@@ -23,7 +23,8 @@ services:
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
-      - db
+      db:
+        condition: service_started
     volumes:
       - ./migrations:/migrations
     networks:
@@ -40,7 +41,8 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - AUTH_KEY=${AUTH_KEY}
     depends_on:
-      - db
+      migration:
+        condition: service_completed_successfully
     networks:
       - one_network
 

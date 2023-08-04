@@ -56,6 +56,54 @@ func (h *Handler) createUser(ctx *gin.Context) {
 	})
 }
 
+// @Summary      Get user by his username
+// @Tags         Users
+// @Accept       json
+// @Produce      json
+// @Param        username   path      string  true  "Username of user"
+//
+// @Success      200 {object} api.DefaultResponseWithBody "Ok"
+// @Failure      400  {object}  api.ErrorResponse
+// @Failure      404  {object}  api.ErrorResponse
+// @Failure      500  {object}  api.ErrorResponse
+// @Router       /user/{username} [get]
+func (h *Handler) getUserByUsername(ctx *gin.Context) {
+	var req api.Username
+
+	err := ctx.ShouldBindUri(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	user, err := h.Services.GetUserByCredentials(ctx, req.Value)
+	if err != nil {
+		switch {
+		case errors.Is(err, repository.ErrRecordNotFound):
+			ctx.JSON(http.StatusNotFound, &api.ErrorResponse{
+				Code:    http.StatusNotFound,
+				Message: "user does not exists",
+			})
+			return
+		default:
+			ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			})
+			return
+		}
+	}
+
+	ctx.JSON(http.StatusOK, &api.DefaultResponseWithBody{
+		Code:    http.StatusOK,
+		Message: "ok",
+		Body:    user,
+	})
+}
+
 // @Summary      Authenticated user and return access token
 // @Tags         Authentication
 // @Accept       json

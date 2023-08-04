@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"one-lab-final/internal/entity"
 	"one-lab-final/internal/handler/api"
+	"one-lab-final/internal/repository"
 	"one-lab-final/pkg/util"
 
 	"github.com/gin-gonic/gin"
@@ -66,6 +68,7 @@ func (h *Handler) createReview(ctx *gin.Context) {
 //
 // @Success      200 {object} api.GetReviewsByBookIDResponse "Reviews info"
 // @Failure      400  {object}  api.ErrorResponse
+// @Failure      404  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
 // @Router       /books/{id}/reviews [get]
 func (h *Handler) getReviewsByBookID(ctx *gin.Context) {
@@ -92,11 +95,20 @@ func (h *Handler) getReviewsByBookID(ctx *gin.Context) {
 
 	reviews, meta, err := h.Services.GetReviewsByBookID(ctx, id.Value, util.NewFilter(req.Page, req.PageSize, req.Sort))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
-		})
-		return
+		switch {
+		case errors.Is(err, repository.ErrRecordNotFound):
+			ctx.JSON(http.StatusNotFound, &api.ErrorResponse{
+				Code:    http.StatusNotFound,
+				Message: "book does not exists",
+			})
+			return
+		default:
+			ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			})
+			return
+		}
 	}
 
 	ctx.JSON(http.StatusOK, &api.GetReviewsByBookIDResponse{

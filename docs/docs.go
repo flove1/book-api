@@ -320,6 +320,43 @@ const docTemplate = `{
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Healthcheck"
+                ],
+                "summary": "Check if server is running",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultResponse"
+                        }
+                    },
+                    "494": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -500,52 +537,7 @@ const docTemplate = `{
                 "summary": "Delete user",
                 "responses": {
                     "200": {
-                        "description": "user succesfully deleted",
-                        "schema": {
-                            "$ref": "#/definitions/api.DefaultResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/delete/{id}": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Delete user by his ID. Requires MODERATOR role or higher",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "user succesfully deleted",
+                        "description": "User succesfully deleted",
                         "schema": {
                             "$ref": "#/definitions/api.DefaultResponse"
                         }
@@ -590,7 +582,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "token succesfully created",
+                        "description": "Token succesfully created",
                         "schema": {
                             "$ref": "#/definitions/api.LoginResponse"
                         }
@@ -682,13 +674,62 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "token succesfully created",
+                        "description": "User succesfully updated",
                         "schema": {
                             "$ref": "#/definitions/api.LoginResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{username}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user by his username",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username of user",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultResponseWithBody"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
@@ -710,7 +751,8 @@ const docTemplate = `{
                 "author",
                 "description",
                 "tags",
-                "title"
+                "title",
+                "year"
             ],
             "properties": {
                 "author": {
@@ -740,6 +782,11 @@ const docTemplate = `{
                     "maxLength": 100,
                     "minLength": 5,
                     "example": "The King in Yellow"
+                },
+                "year": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 1994
                 }
             }
         },
@@ -808,6 +855,18 @@ const docTemplate = `{
         "api.DefaultResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.DefaultResponseWithBody": {
+            "type": "object",
+            "properties": {
+                "body": {},
                 "code": {
                     "type": "integer"
                 },
@@ -943,6 +1002,11 @@ const docTemplate = `{
                     "maxLength": 100,
                     "minLength": 5,
                     "example": "The King in Yellow"
+                },
+                "year": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 1994
                 }
             }
         },
@@ -989,6 +1053,9 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "year": {
+                    "type": "integer"
                 }
             }
         },

@@ -10,7 +10,8 @@ import (
 //go:generate mockery --name DB
 type Repository interface {
 	CreateUser(ctx context.Context, user *entity.User) error
-	GetUserByCredentials(ctx context.Context, username string) (*entity.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*entity.User, error)
+	GetUserByCredentials(ctx context.Context, credentials string) (*entity.User, error)
 	GetUserByToken(ctx context.Context, token string) (*entity.User, error)
 	UpdateUser(ctx context.Context, user *entity.User) error
 	DeleteUser(ctx context.Context, userID int64) error

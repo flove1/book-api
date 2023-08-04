@@ -23,6 +23,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 	reviewV1 := v1.Group("/reviews")
 	modV1 := v1.Group("/mod")
 
+	userV1.GET("/:username", h.getUserByUsername)
 	userV1.POST("/register", h.createUser)
 	userV1.POST("/login", h.login)
 	userV1.PATCH("/update", h.requireAuthenticatedUser(), h.updateUser)

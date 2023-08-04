@@ -55,6 +55,7 @@ func (h *Handler) createBook(ctx *gin.Context) {
 		Description: &req.Description,
 		Author:      &req.Author,
 		Tags:        &req.Tags,
+		Year:        req.Year,
 	})
 
 	if err != nil {
@@ -211,6 +212,7 @@ func (h *Handler) updateBook(ctx *gin.Context) {
 		Description: req.Description,
 		Author:      req.Author,
 		Tags:        req.Tags,
+		Year:        req.Year,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
