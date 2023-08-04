@@ -20,7 +20,7 @@ func TestCreateReview(t *testing.T) {
 		ExpectedReview *entity.Review
 	}{
 		{
-			Name:       "Review created successfullt",
+			Name:       "Review created successfully",
 			MockResult: nil,
 			ExpectedReview: &entity.Review{
 				Content: util.StringToPointer("Very good"),

@@ -97,20 +97,22 @@ func (p *Postgres) GetReviewsByBookID(ctx context.Context, bookID int64, filter 
 func (p *Postgres) UpdateReview(ctx context.Context, review *entity.Review) error {
 	query := fmt.Sprintf(`
 		UPDATE %s SET
-			content = COALESCE($2, content),
-			rating = COALESCE($3, rating),
-			updated_at = $4
+			content = COALESCE($1, content),
+			rating = COALESCE($2, rating),
+			updated_at = $3
 		WHERE 
-			id = $1
+			id = $4
+		AND
+			user_id = $5
 	`, reviewsTable)
 
-	tag, err := p.Pool.Exec(ctx, query, review.ID, review.Content, review.Rating, time.Now())
+	tag, err := p.Pool.Exec(ctx, query, review.Content, review.Rating, time.Now(), review.ID, review.UserID)
 	if err != nil {
 		return err
 	}
 
 	if tag.RowsAffected() == 0 {
-		return errors.New("article does not exists or does not belong to user")
+		return errors.New("review doesn't exists or does not belong to user")
 	}
 
 	return nil
@@ -125,9 +127,13 @@ func (p *Postgres) DeleteReview(ctx context.Context, reviewID int64, userID int6
 			user_id = $2
 	`, reviewsTable)
 
-	_, err := p.Pool.Exec(ctx, query, reviewID, userID)
+	tag, err := p.Pool.Exec(ctx, query, reviewID, userID)
 	if err != nil {
 		return err
+	}
+
+	if tag.RowsAffected() == 0 {
+		return errors.New("review doesn't exists or does not belong to user")
 	}
 
 	return nil

@@ -12,25 +12,73 @@ import (
 )
 
 func TestCreateBook(t *testing.T) {
-	repo := mocks.NewRepository(t)
-	service := New(repo, nil)
-	ctx := context.Background()
+	tests := []struct {
+		Name         string
+		MockResult   any
+		ExpectedBook *entity.Book
+	}{
+		{
+			Name:         "Book created successfully",
+			MockResult:   nil,
+			ExpectedBook: &entity.Book{},
+		},
+		{
+			Name:         "Some error ocurred while saving",
+			MockResult:   errors.New("critical error"),
+			ExpectedBook: &entity.Book{},
+		},
+	}
 
-	title := "Book"
-	book := new(entity.Book)
-	book.Title = &title
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			repo := mocks.NewRepository(t)
+			service := New(repo, nil)
+			ctx := context.Background()
 
-	repo.On("CreateBook", ctx, book).Return(nil).Once()
-	repo.On("CreateBook", ctx, book).Return(errors.New("")).Once()
+			repo.On("CreateBook", ctx, test.ExpectedBook).Return(test.MockResult)
 
-	result := service.CreateBook(ctx, book)
-	assert.Nil(t, result)
-
-	result = service.CreateBook(ctx, book)
-	assert.NotNil(t, result)
+			assert.Equal(t, service.CreateBook(ctx, test.ExpectedBook), test.MockResult)
+		})
+	}
 }
 
 func TestGetBookByID(t *testing.T) {
+	var bookID int64 = 123
+	tests := []struct {
+		Name        string
+		MockResult  any
+		MockError   error
+		ExpectError bool
+	}{
+		{
+			Name:        "Book retrieved successfully",
+			MockResult:  nil,
+			ExpectError: false,
+		},
+		{
+			Name:        "Some error ocurred while retriving",
+			MockError:   errors.New("critical error"),
+			ExpectError: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			repo := mocks.NewRepository(t)
+			service := New(repo, nil)
+			ctx := context.Background()
+
+			repo.On("GetBookByID", ctx, bookID).Return(test.MockResult, test.MockError)
+
+			_, err := service.GetBookByID(ctx, bookID)
+
+			if test.ExpectError {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
 	repo := mocks.NewRepository(t)
 	service := New(repo, nil)
 	ctx := context.Background()
@@ -50,35 +98,59 @@ func TestGetBookByID(t *testing.T) {
 }
 
 func TestGetBooks(t *testing.T) {
-	repo := mocks.NewRepository(t)
-	service := New(repo, nil)
-	ctx := context.Background()
-
-	books := make([]*entity.Book, 5)
-
-	filter := util.NewFilter(1, 50, "created_at")
-	invalidFilter := util.NewFilter(1, 50, "name")
-
-	title := "Book"
+	title := "Title"
 	author := "Author"
-	tags := []string{"tag1", "tag2"}
+	tags := []string{"tag1"}
+	tests := []struct {
+		Name           string
+		MockResultErr  error
+		MockResultMeta *util.Metadata
+		MockResult     any
+		SkipMock       bool
+		BookID         int64
+		Filter         util.Filter
+		ExpectedErr    bool
+	}{
+		{
+			Name:           "Get books succesfuly",
+			MockResult:     []*entity.Book{{}, {}},
+			MockResultMeta: &util.Metadata{},
+			Filter:         util.NewFilter(1, 10, "created_at"),
+			ExpectedErr:    false,
+		},
+		{
+			Name:        "Non-valid sort",
+			SkipMock:    true,
+			Filter:      util.NewFilter(1, 10, "everything"),
+			ExpectedErr: true,
+		},
+		{
+			Name:          "Error while retriving",
+			MockResultErr: errors.New("critical error"),
+			Filter:        util.NewFilter(1, 10, "created_at"),
+			ExpectedErr:   true,
+		},
+	}
 
-	meta := filter.CalculateMetadata(len(books))
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			repo := mocks.NewRepository(t)
+			service := New(repo, nil)
+			ctx := context.Background()
 
-	repo.On("GetBooks", ctx, &title, &author, &tags, filter).Return(books, &meta, nil).Once()
-	repo.On("GetBooks", ctx, &title, &author, &tags, filter).Return(nil, nil, errors.New("some error")).Once()
+			if !test.SkipMock {
+				repo.On("GetBooks", ctx, &title, &author, &tags, test.Filter).Return(test.MockResult, test.MockResultMeta, test.MockResultErr)
+			}
 
-	result, _, err := service.GetBooks(ctx, &title, &author, &tags, filter)
-	assert.NotNil(t, result)
-	assert.Nil(t, err)
+			_, _, err := service.GetBooks(ctx, &title, &author, &tags, test.Filter)
 
-	result, _, err = service.GetBooks(ctx, &title, &author, &tags, invalidFilter)
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
-
-	result, _, err = service.GetBooks(ctx, &title, &author, &tags, filter)
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
+			if test.ExpectedErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
 }
 
 func TestDeleteBook(t *testing.T) {
@@ -99,36 +171,60 @@ func TestDeleteBook(t *testing.T) {
 }
 
 func TestUpdateBook(t *testing.T) {
-	repo := mocks.NewRepository(t)
-	service := New(repo, nil)
-	ctx := context.Background()
+	tests := []struct {
+		Name         string
+		MockResult   any
+		ExpectedBook *entity.Book
+	}{
+		{
+			Name:         "Book updated successfully",
+			MockResult:   nil,
+			ExpectedBook: &entity.Book{},
+		},
+		{
+			Name:         "Some error ocurred while updating",
+			MockResult:   errors.New("critical error"),
+			ExpectedBook: &entity.Book{},
+		},
+	}
 
-	title := "Book"
-	book := new(entity.Book)
-	book.ID = 1
-	book.Title = &title
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			repo := mocks.NewRepository(t)
+			service := New(repo, nil)
+			ctx := context.Background()
 
-	repo.On("UpdateBook", ctx, book).Return(nil).Once()
-	repo.On("UpdateBook", ctx, book).Return(errors.New("some error")).Once()
+			repo.On("UpdateBook", ctx, test.ExpectedBook).Return(test.MockResult)
 
-	result := service.UpdateBook(ctx, book)
-	assert.Nil(t, result)
-
-	result = service.UpdateBook(ctx, book)
-	assert.NotNil(t, result)
+			assert.Equal(t, service.UpdateBook(ctx, test.ExpectedBook), test.MockResult)
+		})
+	}
 }
 
 func TestRefreshBooksRating(t *testing.T) {
-	repo := mocks.NewRepository(t)
-	service := New(repo, nil)
-	ctx := context.Background()
+	tests := []struct {
+		Name       string
+		MockResult any
+	}{
+		{
+			Name:       "Refreshed successfully",
+			MockResult: nil,
+		},
+		{
+			Name:       "Some error ocurred while refreshing",
+			MockResult: errors.New("critical error"),
+		},
+	}
 
-	repo.On("RefreshBooksRating", ctx).Return(nil).Once()
-	repo.On("RefreshBooksRating", ctx).Return(errors.New("some error")).Once()
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			repo := mocks.NewRepository(t)
+			service := New(repo, nil)
+			ctx := context.Background()
 
-	result := service.RefreshBooksRating(ctx)
-	assert.Nil(t, result)
+			repo.On("RefreshBooksRating", ctx).Return(test.MockResult)
 
-	result = service.RefreshBooksRating(ctx)
-	assert.NotNil(t, result)
+			assert.Equal(t, service.RefreshBooksRating(ctx), test.MockResult)
+		})
+	}
 }

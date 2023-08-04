@@ -31,4 +31,10 @@ type Repository interface {
 	GetReviewsByBookID(ctx context.Context, bookID int64, filter util.Filter) ([]*entity.Review, *util.Metadata, error)
 	UpdateReview(ctx context.Context, review *entity.Review) error
 	DeleteReview(ctx context.Context, reviewID int64, userID int64) error
+
+	NewSuspension(ctx context.Context, suspension *entity.Suspension) error
+	CheckSuspension(ctx context.Context, userID int64) ([]*entity.Suspension, error)
+	UpdateSuspension(ctx context.Context, suspension *entity.Suspension) error
+
+	GrantRoleToUser(ctx context.Context, userID int64, role entity.Role) error
 }

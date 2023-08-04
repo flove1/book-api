@@ -1,5 +1,16 @@
 basePath: /api/v1
 definitions:
+  api.CheckSuspensionResponse:
+    properties:
+      body:
+        items:
+          $ref: '#/definitions/entity.Suspension'
+        type: array
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
   api.CreateBookRequest:
     properties:
       author:
@@ -51,6 +62,23 @@ definitions:
     required:
     - content
     - rating
+    type: object
+  api.CreateSuspensionRequest:
+    properties:
+      expires_in:
+        description: Time in minutes
+        minimum: 1
+        type: integer
+      reason:
+        example: Bad behaviour
+        type: string
+      user_id:
+        example: 21
+        type: integer
+    required:
+    - expires_in
+    - reason
+    - user_id
     type: object
   api.CreateUserRequest:
     properties:
@@ -142,6 +170,15 @@ definitions:
       message:
         type: string
     type: object
+  api.GrantRoleToUser:
+    properties:
+      role:
+        description: 'Allowed values: "user", "moderator", "admin"'
+        example: ADMIN
+        type: string
+    required:
+    - role
+    type: object
   api.LoginRequest:
     properties:
       credentials:
@@ -204,6 +241,16 @@ definitions:
         example: 100
         type: integer
     type: object
+  api.UpdateSuspensionRequest:
+    properties:
+      expires_in:
+        description: Time in minutes
+        minimum: 1
+        type: integer
+      reason:
+        example: Bad behaviour
+        type: string
+    type: object
   entity.Book:
     properties:
       author:
@@ -254,6 +301,23 @@ definitions:
     - USER
     - MODERATOR
     - ADMIN
+  entity.Suspension:
+    properties:
+      created_at:
+        type: string
+      expires_in:
+        type: integer
+      id:
+        type: integer
+      moderator_id:
+        type: integer
+      reason:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
   entity.Token:
     properties:
       expiry:
@@ -525,6 +589,109 @@ paths:
       summary: Check if server is running
       tags:
       - Healthcheck
+  /mod/roles/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.GrantRoleToUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: role of user was successfully updated
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update role of user by his ID. Requires ADMIN role
+      tags:
+      - Moderation
+  /mod/suspensions/new:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CreateSuspensionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User was successfully suspended
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Suspend user for some time. Requires MODERATOR role or higher
+      tags:
+      - Moderation
+  /mod/suspensions/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Suspension ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Request body
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.UpdateSuspensionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: suspension was successfully updated
+          schema:
+            $ref: '#/definitions/api.DefaultResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Modify suspension of user. Requires MODERATOR role or higher
+      tags:
+      - Moderation
   /reviews/delete/{id}:
     delete:
       consumes:
@@ -622,7 +789,7 @@ paths:
       summary: Update review by ID
       tags:
       - Reviews
-  /user/{username}:
+  /users/{username}:
     get:
       consumes:
       - application/json
@@ -654,7 +821,7 @@ paths:
       summary: Get user by his username
       tags:
       - Users
-  /user/delete:
+  /users/delete:
     delete:
       produces:
       - application/json
@@ -676,7 +843,7 @@ paths:
       summary: Delete user
       tags:
       - Users
-  /user/login:
+  /users/login:
     post:
       consumes:
       - application/json
@@ -705,7 +872,7 @@ paths:
       summary: Authenticated user and return access token
       tags:
       - Authentication
-  /user/register:
+  /users/register:
     post:
       consumes:
       - application/json
@@ -734,7 +901,35 @@ paths:
       summary: Register new user
       tags:
       - Users
-  /user/update:
+  /users/suspensions/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/api.CheckSuspensionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Check if user has suspensions
+      tags:
+      - Users
+  /users/update:
     patch:
       parameters:
       - description: Request body
@@ -746,7 +941,7 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
+        "200":
           description: User succesfully updated
           schema:
             $ref: '#/definitions/api.LoginResponse'

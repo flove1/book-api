@@ -20,7 +20,7 @@ import (
 // @Success      201 {object} api.DefaultResponse "User succesfully created"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
-// @Router       /user/register [post]
+// @Router       /users/register [post]
 func (h *Handler) createUser(ctx *gin.Context) {
 	var req api.CreateUserRequest
 
@@ -41,6 +41,7 @@ func (h *Handler) createUser(ctx *gin.Context) {
 		Password: entity.Password{
 			Plaintext: &req.Password,
 		},
+		Role: entity.USER,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
@@ -66,7 +67,7 @@ func (h *Handler) createUser(ctx *gin.Context) {
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      404  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
-// @Router       /user/{username} [get]
+// @Router       /users/{username} [get]
 func (h *Handler) getUserByUsername(ctx *gin.Context) {
 	var req api.Username
 
@@ -79,7 +80,7 @@ func (h *Handler) getUserByUsername(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.Services.GetUserByCredentials(ctx, req.Value)
+	user, err := h.Services.GetUserByUsername(ctx, req.Value)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrRecordNotFound):
@@ -113,7 +114,7 @@ func (h *Handler) getUserByUsername(ctx *gin.Context) {
 // @Success      201 {object} api.LoginResponse "Token succesfully created"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
-// @Router       /user/login [post]
+// @Router       /users/login [post]
 func (h *Handler) login(ctx *gin.Context) {
 	var req api.LoginRequest
 
@@ -157,10 +158,10 @@ func (h *Handler) login(ctx *gin.Context) {
 // @Security ApiKeyAuth
 // @Param data body api.LoginRequest true "Request body"
 //
-// @Success      201 {object} api.LoginResponse "User succesfully updated"
+// @Success      200 {object} api.LoginResponse "User succesfully updated"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
-// @Router       /user/update [patch]
+// @Router       /users/update [patch]
 func (h *Handler) updateUser(ctx *gin.Context) {
 	var req api.UpdateUserRequest
 
@@ -205,7 +206,7 @@ func (h *Handler) updateUser(ctx *gin.Context) {
 // @Success      200 {object} api.DefaultResponse "User succesfully deleted"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
-// @Router       /user/delete [delete]
+// @Router       /users/delete [delete]
 func (h *Handler) deleteUser(ctx *gin.Context) {
 	userID := ctx.MustGet("userID").(int64)
 
@@ -221,5 +222,63 @@ func (h *Handler) deleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &api.DefaultResponse{
 		Code:    http.StatusOK,
 		Message: "user succesfully deleted",
+	})
+}
+
+// @Summary      Update role of user by his ID. Requires ADMIN role
+// @Tags         Moderation
+// @Accept       json
+// @Produce      json
+// @Security ApiKeyAuth
+// @Param        id   path      int  true  "User ID"
+// @Param data body api.GrantRoleToUser true "Request body"
+//
+// @Success      200 {object} api.DefaultResponse "role of user was successfully updated"
+// @Failure      400  {object}  api.ErrorResponse
+// @Failure      500  {object}  api.ErrorResponse
+// @Router       /mod/roles/{id} [patch]
+func (h *Handler) grantRoleToUser(ctx *gin.Context) {
+	var req api.GrantRoleToUser
+	var id api.ID
+
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	err = ctx.ShouldBindUri(&id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	role, ok := entity.StringToRole(req.Role)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "role does not exists",
+		})
+		return
+	}
+
+	err = h.Services.GrantRoleToUser(ctx, id.Value, role)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &api.DefaultResponse{
+		Code:    http.StatusOK,
+		Message: "role of user was successfully updated",
 	})
 }

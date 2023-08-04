@@ -32,6 +32,15 @@ func TestAuthenticate(t *testing.T) {
 			ExpectedToken:  "token",
 			ExpectedCode:   http.StatusOK,
 			ExpectedStatus: true,
+		}, {
+			Name: "Suspended user",
+			MockResult: &entity.User{
+				Suspended: true,
+			},
+			Token:          "Bearer token",
+			ExpectedToken:  "token",
+			ExpectedCode:   http.StatusForbidden,
+			ExpectedStatus: false,
 		},
 		{
 			Name:           "Non-valid token",

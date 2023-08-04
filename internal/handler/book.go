@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"one-lab-final/internal/entity"
 	"one-lab-final/internal/handler/api"
@@ -50,13 +51,15 @@ func (h *Handler) createBook(ctx *gin.Context) {
 		return
 	}
 
-	err = h.Services.CreateBook(ctx, &entity.Book{
+	book := &entity.Book{
 		Title:       &req.Title,
 		Description: &req.Description,
 		Author:      &req.Author,
 		Tags:        &req.Tags,
 		Year:        req.Year,
-	})
+	}
+
+	err = h.Services.CreateBook(ctx, book)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
@@ -65,6 +68,8 @@ func (h *Handler) createBook(ctx *gin.Context) {
 		})
 		return
 	}
+
+	ctx.Header("Locations", fmt.Sprintf("/books/%d", book.ID))
 
 	ctx.JSON(http.StatusCreated, &api.DefaultResponse{
 		Code:    http.StatusCreated,
@@ -172,9 +177,8 @@ func (h *Handler) getBooks(ctx *gin.Context) {
 // @Router       /books/update/{id} [patch]
 func (h *Handler) updateBook(ctx *gin.Context) {
 	var req api.UpdateBookRequest
-	var id api.ID
 
-	err := ctx.ShouldBindUri(&id)
+	err := ctx.ShouldBindUri(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
 			Code:    http.StatusBadRequest,
@@ -207,7 +211,7 @@ func (h *Handler) updateBook(ctx *gin.Context) {
 	}
 
 	err = h.Services.UpdateBook(ctx, &entity.Book{
-		ID:          id.Value,
+		ID:          req.ID.Value,
 		Title:       req.Title,
 		Description: req.Description,
 		Author:      req.Author,

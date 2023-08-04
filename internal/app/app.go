@@ -77,7 +77,7 @@ func Run(cfg *config.Config) error {
 			Role: entity.ADMIN,
 		}
 		log.Print("admin user does not exists, creating new one...")
-		err = services.CreateUser(context.Background(), admin)
+		services.CreateUser(context.Background(), admin)
 
 	} else {
 		log.Print("admin user exists, updating info...")

@@ -21,13 +21,14 @@ func (p *Postgres) CreateUser(ctx context.Context, u *entity.User) error {
 			email,
 			first_name,
 			last_name,
+			role,
 			password_hash
-			)
-		VALUES ($1, $2, $3, $4, $5)
+		)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
 		`, usersTable)
 
-	err := p.Pool.QueryRow(ctx, query, u.Username, u.Email, u.FirstName, u.LastName, u.Password.Hash).Scan(&u.ID)
+	err := p.Pool.QueryRow(ctx, query, u.Username, u.Email, u.FirstName, u.LastName, u.Role.String(), u.Password.Hash).Scan(&u.ID)
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ func (p *Postgres) GetUserByUsername(ctx context.Context, username string) (*ent
 				email,
 				first_name,
 				last_name,
-				created_at
+				created_at,
 			FROM %s
 			WHERE 
 				username = $1
@@ -122,7 +123,8 @@ func (p *Postgres) GetUserByToken(ctx context.Context, token string) (*entity.Us
 			u.password_hash,
 			u.created_at,
 			u.updated_at,
-			u.role
+			u.role,
+			(SELECT EXISTS(SELECT * FROM %[3]s s WHERE s.user_id=u.id AND (s.created_at + s.expires_in) > $2)) AS suspended
 		FROM %[1]s u
 		INNER JOIN %[2]s  t
 		ON u.id = t.user_id
@@ -143,6 +145,7 @@ func (p *Postgres) GetUserByToken(ctx context.Context, token string) (*entity.Us
 		&user.CreatedAt,
 		&user.UpdatedAt,
 		&roleString,
+		&user.Suspended,
 	)
 	if err != nil {
 		switch {
@@ -189,6 +192,22 @@ func (p *Postgres) DeleteUser(ctx context.Context, userID int64) error {
 	`, usersTable)
 
 	_, err := p.Pool.Exec(ctx, query, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Postgres) GrantRoleToUser(ctx context.Context, userID int64, role entity.Role) error {
+	query := fmt.Sprintf(`
+		UPDATE %s SET
+			role = $1
+		WHERE 
+			id = $2
+	`, usersTable)
+
+	_, err := p.Pool.Exec(ctx, query, role.String(), userID)
 	if err != nil {
 		return err
 	}

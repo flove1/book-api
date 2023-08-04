@@ -14,37 +14,19 @@ func (m *Manager) CreateUser(ctx context.Context, u *entity.User) error {
 
 	u.Password.Hash = &hash
 
-	err = m.Repository.CreateUser(ctx, u)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Repository.CreateUser(ctx, u)
 }
 
 func (m *Manager) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
-	user, err := m.Repository.GetUserByUsername(ctx, username)
-	if err != nil {
-		return nil, err
-	}
-	return user, err
+	return m.Repository.GetUserByUsername(ctx, username)
 }
 
 func (m *Manager) GetUserByCredentials(ctx context.Context, credentials string) (*entity.User, error) {
-	user, err := m.Repository.GetUserByCredentials(ctx, credentials)
-	if err != nil {
-		return nil, err
-	}
-	return user, err
+	return m.Repository.GetUserByCredentials(ctx, credentials)
 }
 
 func (m *Manager) GetUserByToken(ctx context.Context, token string) (*entity.User, error) {
-	user, err := m.Repository.GetUserByToken(ctx, token)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	return m.Repository.GetUserByToken(ctx, token)
 }
 
 func (m *Manager) UpdateUser(ctx context.Context, u *entity.User) error {
@@ -57,17 +39,13 @@ func (m *Manager) UpdateUser(ctx context.Context, u *entity.User) error {
 		u.Password.Hash = &hash
 	}
 
-	err := m.Repository.UpdateUser(ctx, u)
-	if err != nil {
-		return err
-	}
-	return nil
+	return m.Repository.UpdateUser(ctx, u)
 }
 
 func (m *Manager) DeleteUser(ctx context.Context, userID int64) error {
-	err := m.Repository.DeleteUser(ctx, userID)
-	if err != nil {
-		return err
-	}
-	return nil
+	return m.Repository.DeleteUser(ctx, userID)
+}
+
+func (m *Manager) GrantRoleToUser(ctx context.Context, userID int64, role entity.Role) error {
+	return m.Repository.GrantRoleToUser(ctx, userID, role)
 }

@@ -29,4 +29,10 @@ type Service interface {
 
 	Login(ctx context.Context, credentials string, password string) (*entity.Token, error)
 	DeleteExpiredTokens(ctx context.Context) error
+
+	NewSuspension(ctx context.Context, suspension *entity.Suspension) error
+	UpdateSuspension(ctx context.Context, suspension *entity.Suspension) error
+	CheckSuspension(ctx context.Context, userID int64) ([]*entity.Suspension, error)
+
+	GrantRoleToUser(ctx context.Context, userID int64, role entity.Role) error
 }

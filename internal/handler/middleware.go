@@ -24,7 +24,7 @@ func (h *Handler) requireRole(requiredRole entity.Role) gin.HandlerFunc {
 		if role < requiredRole {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, api.ErrorResponse{
 				Code:    http.StatusUnauthorized,
-				Message: "denied",
+				Message: "not enought rights",
 			})
 			return
 		}
@@ -82,6 +82,13 @@ func (h *Handler) authenticate(ctx *gin.Context) bool {
 		}
 	}
 
+	if user.Suspended {
+		ctx.AbortWithStatusJSON(http.StatusForbidden, api.ErrorResponse{
+			Code:    http.StatusForbidden,
+			Message: "user was suspended",
+		})
+		return false
+	}
 	ctx.Set("userID", user.ID)
 	ctx.Set("role", user.Role)
 

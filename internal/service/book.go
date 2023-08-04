@@ -7,21 +7,11 @@ import (
 )
 
 func (m *Manager) CreateBook(ctx context.Context, book *entity.Book) error {
-	err := m.Repository.CreateBook(ctx, book)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Repository.CreateBook(ctx, book)
 }
 
 func (m *Manager) GetBookByID(ctx context.Context, bookID int64) (*entity.Book, error) {
-	book, err := m.Repository.GetBookByID(ctx, bookID)
-	if err != nil {
-		return nil, err
-	}
-
-	return book, nil
+	return m.Repository.GetBookByID(ctx, bookID)
 }
 
 func (m *Manager) GetBooks(ctx context.Context, title *string, author *string, tags *[]string, filter util.Filter) ([]*entity.Book, *util.Metadata, error) {
@@ -38,37 +28,17 @@ func (m *Manager) GetBooks(ctx context.Context, title *string, author *string, t
 		return nil, nil, ErrInvalidSortValue
 	}
 
-	books, meta, err := m.Repository.GetBooks(ctx, title, author, tags, filter)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return books, meta, nil
+	return m.Repository.GetBooks(ctx, title, author, tags, filter)
 }
 
 func (m *Manager) DeleteBook(ctx context.Context, articleID int64) error {
-	err := m.Repository.DeleteBook(ctx, articleID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Repository.DeleteBook(ctx, articleID)
 }
 
 func (m *Manager) UpdateBook(ctx context.Context, book *entity.Book) error {
-	err := m.Repository.UpdateBook(ctx, book)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Repository.UpdateBook(ctx, book)
 }
 
 func (m *Manager) RefreshBooksRating(ctx context.Context) error {
-	err := m.Repository.RefreshBooksRating(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Repository.RefreshBooksRating(ctx)
 }

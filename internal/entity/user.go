@@ -10,6 +10,7 @@ type User struct {
 	LastName  *string   `json:"last_name" db:"last_name"`
 	Password  Password  `json:"-" db:"password_hash"`
 	Role      Role      `json:"role" db:"role"`
+	Suspended bool      `json:"-"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }

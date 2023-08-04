@@ -28,5 +28,5 @@ func (role Role) String() string {
 		}
 	}
 
-	panic("not-existing role")
+	return ""
 }

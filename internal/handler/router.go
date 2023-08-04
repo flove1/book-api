@@ -24,6 +24,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 	modV1 := v1.Group("/mod")
 
 	userV1.GET("/:username", h.getUserByUsername)
+	userV1.GET("/suspensions/:id", h.checkSuspension)
 	userV1.POST("/register", h.createUser)
 	userV1.POST("/login", h.login)
 	userV1.PATCH("/update", h.requireAuthenticatedUser(), h.updateUser)
@@ -41,7 +42,10 @@ func (h *Handler) InitRouter() *gin.Engine {
 	reviewV1.PATCH("/update/:id", h.requireAuthenticatedUser(), h.updateReview)
 	reviewV1.DELETE("/delete/:id", h.requireAuthenticatedUser(), h.deleteReview)
 
-	modV1.Use(h.requireRole(entity.MODERATOR))
+	modV1.POST("/suspensions/new", h.requireRole(entity.MODERATOR), h.suspendUser)
+	modV1.PATCH("/suspensions/update/:id", h.requireRole(entity.MODERATOR), h.updateSuspension)
+
+	modV1.PATCH("/roles/:id", h.requireRole(entity.ADMIN), h.grantRoleToUser)
 
 	return router
 }

@@ -186,7 +186,7 @@ func (p *Postgres) UpdateBook(ctx context.Context, book *entity.Book) error {
 	}
 
 	if tag.RowsAffected() == 0 {
-		return errors.New("article does not exists or does not belong to user")
+		return errors.New("book doesn't exist")
 	}
 
 	return nil
@@ -197,13 +197,9 @@ func (p *Postgres) RefreshBooksRating(ctx context.Context) error {
 		REFRESH MATERIALIZED VIEW %s;
 	`, booksAvgRatingView)
 
-	tag, err := p.Pool.Exec(ctx, query)
+	_, err := p.Pool.Exec(ctx, query)
 	if err != nil {
 		return err
-	}
-
-	if tag.RowsAffected() == 0 {
-		return errors.New("article does not exists or does not belong to user")
 	}
 
 	return nil

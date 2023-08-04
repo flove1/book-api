@@ -2,9 +2,11 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"one-lab-final/internal/entity"
+	"one-lab-final/internal/repository"
 	"one-lab-final/internal/service/mocks"
 	"one-lab-final/pkg/util"
 	"strings"
@@ -103,6 +105,70 @@ func TestCreateUser(t *testing.T) {
 
 			service.On("CreateUser", ctx, &test.ExpectedUser).Return(test.MockResult)
 			handler.createUser(ctx)
+			assert.Equal(t, test.ExpectedCode, w.Code)
+		})
+	}
+}
+
+func TestGetUserByUsername(t *testing.T) {
+	tests := []struct {
+		Name             string
+		RequestURI       *string
+		MockResult       any
+		MockError        error
+		ExpectedUsername string
+		ExpectedCode     int
+	}{
+		{
+			Name:             "Get user successfully",
+			RequestURI:       util.StringToPointer("flove"),
+			MockResult:       &entity.User{},
+			ExpectedUsername: "flove",
+			ExpectedCode:     http.StatusOK,
+		},
+		{
+			Name:         "Missing username",
+			RequestURI:   nil,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:             "Non-existing user",
+			RequestURI:       util.StringToPointer("flove"),
+			MockError:        repository.ErrRecordNotFound,
+			ExpectedUsername: "flove",
+			ExpectedCode:     http.StatusNotFound,
+		},
+		{
+			Name:             "Error while retrieving entity",
+			RequestURI:       util.StringToPointer("flove"),
+			MockError:        errors.New("critical error"),
+			ExpectedUsername: "flove",
+			ExpectedCode:     http.StatusInternalServerError,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			w := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(w)
+
+			service := &mocks.Service{}
+			handler := New(service, nil)
+
+			req, _ := http.NewRequest("GET", "/users/"+test.ExpectedUsername, strings.NewReader(""))
+			req.Header.Set("Content-Type", "application/json")
+
+			if test.RequestURI != nil {
+				param := gin.Param{Key: "username", Value: *test.RequestURI}
+				ctx.Params = append(ctx.Params, param)
+			}
+
+			ctx.Request = req
+
+			service.On("GetUserByUsername", ctx, test.ExpectedUsername).Return(test.MockResult, test.MockError)
+			handler.getUserByUsername(ctx)
 			assert.Equal(t, test.ExpectedCode, w.Code)
 		})
 	}
@@ -322,6 +388,89 @@ func TestDeleteUser(t *testing.T) {
 
 			service.On("DeleteUser", ctx, test.ExpectedID).Return(test.MockResult)
 			handler.deleteUser(ctx)
+			assert.Equal(t, test.ExpectedCode, w.Code)
+		})
+	}
+}
+
+func TestGrantRoleToUser(t *testing.T) {
+	var userID int64 = 123
+	userRole := entity.ADMIN
+	tests := []struct {
+		Name         string
+		RequestURI   string
+		RequestJSON  string
+		MockResult   any
+		ExpectedID   int64
+		ExpectedRole entity.Role
+		ExpectedCode int
+	}{
+		{
+			Name:       "Update role successfully",
+			RequestURI: fmt.Sprintf("%d", userID),
+			RequestJSON: `
+			{
+				"role": "admin"
+			}`,
+			ExpectedID:   userID,
+			ExpectedRole: userRole,
+			MockResult:   nil,
+			ExpectedCode: http.StatusOK,
+		},
+		{
+			Name:         "Malformed id",
+			RequestURI:   "noo",
+			RequestJSON:  `{"role": "admin"}`,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:       "Malformed json",
+			RequestURI: "noo",
+			RequestJSON: `
+			{
+				boo
+			}`,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:       "Non-existing role",
+			RequestURI: fmt.Sprintf("%d", userID),
+			RequestJSON: `
+			{
+				"role": "fdsf"
+			}`,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:         "Error while updating role",
+			RequestURI:   fmt.Sprintf("%d", userID),
+			RequestJSON:  `{"role": "admin"}`,
+			ExpectedID:   userID,
+			ExpectedRole: userRole,
+			MockResult:   errors.New("critical error"),
+			ExpectedCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			w := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(w)
+
+			service := &mocks.Service{}
+			handler := New(service, nil)
+
+			req, _ := http.NewRequest("PATCH", "/mod/roles/"+test.RequestURI, strings.NewReader(test.RequestJSON))
+			req.Header.Set("Content-Type", "application/json")
+
+			param := gin.Param{Key: "id", Value: test.RequestURI}
+			ctx.Params = append(ctx.Params, param)
+			ctx.Request = req
+
+			service.On("GrantRoleToUser", ctx, test.ExpectedID, test.ExpectedRole).Return(test.MockResult)
+			handler.grantRoleToUser(ctx)
 			assert.Equal(t, test.ExpectedCode, w.Code)
 		})
 	}

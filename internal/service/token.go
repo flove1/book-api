@@ -39,10 +39,5 @@ func (m *Manager) Login(ctx context.Context, credentials string, password string
 }
 
 func (m *Manager) DeleteExpiredTokens(ctx context.Context) error {
-	err := m.Repository.DeleteExpiredTokens(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.Repository.DeleteExpiredTokens(ctx)
 }

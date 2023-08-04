@@ -366,6 +366,170 @@ const docTemplate = `{
                 }
             }
         },
+        "/mod/roles/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Update role of user by his ID. Requires ADMIN role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.GrantRoleToUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "role of user was successfully updated",
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mod/suspensions/new": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Suspend user for some time. Requires MODERATOR role or higher",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.CreateSuspensionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User was successfully suspended",
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mod/suspensions/update/{id}": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Moderation"
+                ],
+                "summary": "Modify suspension of user. Requires MODERATOR role or higher",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Suspension ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.UpdateSuspensionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "suspension was successfully updated",
+                        "schema": {
+                            "$ref": "#/definitions/api.DefaultResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/reviews/delete/{id}": {
             "delete": {
                 "security": [
@@ -521,7 +685,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/delete": {
+        "/users/delete": {
             "delete": {
                 "security": [
                     {
@@ -557,7 +721,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/login": {
+        "/users/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -602,7 +766,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/register": {
+        "/users/register": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -647,7 +811,50 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/update": {
+        "/users/suspensions/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Check if user has suspensions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/api.CheckSuspensionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/update": {
             "patch": {
                 "security": [
                     {
@@ -673,7 +880,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "User succesfully updated",
                         "schema": {
                             "$ref": "#/definitions/api.LoginResponse"
@@ -694,7 +901,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{username}": {
+        "/users/{username}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -745,6 +952,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.CheckSuspensionResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Suspension"
+                    }
+                },
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "api.CreateBookRequest": {
             "type": "object",
             "required": [
@@ -809,6 +1033,29 @@ const docTemplate = `{
                     "type": "integer",
                     "default": 0,
                     "example": 100
+                }
+            }
+        },
+        "api.CreateSuspensionRequest": {
+            "type": "object",
+            "required": [
+                "expires_in",
+                "reason",
+                "user_id"
+            ],
+            "properties": {
+                "expires_in": {
+                    "description": "Time in minutes",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "reason": {
+                    "type": "string",
+                    "example": "Bad behaviour"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 21
                 }
             }
         },
@@ -942,6 +1189,19 @@ const docTemplate = `{
                 }
             }
         },
+        "api.GrantRoleToUser": {
+            "type": "object",
+            "required": [
+                "role"
+            ],
+            "properties": {
+                "role": {
+                    "description": "Allowed values: \"user\", \"moderator\", \"admin\"",
+                    "type": "string",
+                    "example": "ADMIN"
+                }
+            }
+        },
         "api.LoginRequest": {
             "type": "object",
             "required": [
@@ -1026,6 +1286,20 @@ const docTemplate = `{
                 }
             }
         },
+        "api.UpdateSuspensionRequest": {
+            "type": "object",
+            "properties": {
+                "expires_in": {
+                    "description": "Time in minutes",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "reason": {
+                    "type": "string",
+                    "example": "Bad behaviour"
+                }
+            }
+        },
         "entity.Book": {
             "type": "object",
             "properties": {
@@ -1099,6 +1373,32 @@ const docTemplate = `{
                 "MODERATOR",
                 "ADMIN"
             ]
+        },
+        "entity.Suspension": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "moderator_id": {
+                    "type": "integer"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
         },
         "entity.Token": {
             "type": "object",

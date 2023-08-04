@@ -36,3 +36,9 @@ type GetReviewsByBookIDResponse struct {
 	Body    []*entity.Review `json:"body"`
 	Meta    util.Metadata    `json:"meta"`
 }
+
+type CheckSuspensionResponse struct {
+	Code    int                  `json:"code"`
+	Message string               `json:"message"`
+	Body    []*entity.Suspension `json:"body"`
+}

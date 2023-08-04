@@ -19,3 +19,8 @@ type LoginRequest struct {
 	Credentials string `json:"credentials" binding:"required" example:"username"`
 	Password    string `json:"password" binding:"required" example:"password"`
 }
+
+type GrantRoleToUser struct {
+	//Allowed values: "user", "moderator", "admin"
+	Role string `json:"role" binding:"required"  example:"ADMIN"`
+}

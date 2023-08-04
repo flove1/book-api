@@ -9,6 +9,7 @@ type CreateBookRequest struct {
 }
 
 type UpdateBookRequest struct {
+	ID
 	Title       *string   `json:"title" binding:"omitempty,min=5,max=100" example:"The King in Yellow"`
 	Author      *string   `json:"author" binding:"omitempty,min=5,max=100" example:"Robert W. Chambers"`
 	Description *string   `json:"description" binding:"omitempty" example:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."`

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"one-lab-final/internal/entity"
+	"one-lab-final/internal/repository"
 	"one-lab-final/internal/service/mocks"
 	"one-lab-final/pkg/util"
 	"strings"
@@ -131,6 +132,15 @@ func TestGetReviewsByBookID(t *testing.T) {
 			MockResultErr:  nil,
 			ExpectedID:     bookID,
 			ExpectedCode:   http.StatusOK,
+		},
+		{
+			Name:           "Book doesn't exist",
+			RequestURI:     fmt.Sprintf("%d", bookID),
+			RequestQuery:   `page=1&page_size=10&sort=created_at`,
+			MockResultErr:  repository.ErrRecordNotFound,
+			MockResultMeta: &util.Metadata{},
+			ExpectedID:     bookID,
+			ExpectedCode:   http.StatusNotFound,
 		},
 		{
 			Name:         "Non-valid URI path",

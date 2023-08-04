@@ -16,6 +16,32 @@ type Service struct {
 	mock.Mock
 }
 
+// CheckSuspension provides a mock function with given fields: ctx, userID
+func (_m *Service) CheckSuspension(ctx context.Context, userID int64) ([]*entity.Suspension, error) {
+	ret := _m.Called(ctx, userID)
+
+	var r0 []*entity.Suspension
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) ([]*entity.Suspension, error)); ok {
+		return rf(ctx, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64) []*entity.Suspension); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*entity.Suspension)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateBook provides a mock function with given fields: ctx, book
 func (_m *Service) CreateBook(ctx context.Context, book *entity.Book) error {
 	ret := _m.Called(ctx, book)
@@ -288,6 +314,20 @@ func (_m *Service) GetUserByUsername(ctx context.Context, username string) (*ent
 	return r0, r1
 }
 
+// GrantRoleToUser provides a mock function with given fields: ctx, userID, role
+func (_m *Service) GrantRoleToUser(ctx context.Context, userID int64, role entity.Role) error {
+	ret := _m.Called(ctx, userID, role)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64, entity.Role) error); ok {
+		r0 = rf(ctx, userID, role)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Login provides a mock function with given fields: ctx, credentials, password
 func (_m *Service) Login(ctx context.Context, credentials string, password string) (*entity.Token, error) {
 	ret := _m.Called(ctx, credentials, password)
@@ -312,6 +352,20 @@ func (_m *Service) Login(ctx context.Context, credentials string, password strin
 	}
 
 	return r0, r1
+}
+
+// NewSuspension provides a mock function with given fields: ctx, suspension
+func (_m *Service) NewSuspension(ctx context.Context, suspension *entity.Suspension) error {
+	ret := _m.Called(ctx, suspension)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.Suspension) error); ok {
+		r0 = rf(ctx, suspension)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // RefreshBooksRating provides a mock function with given fields: ctx
@@ -349,6 +403,20 @@ func (_m *Service) UpdateReview(ctx context.Context, review *entity.Review) erro
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, *entity.Review) error); ok {
 		r0 = rf(ctx, review)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateSuspension provides a mock function with given fields: ctx, suspension
+func (_m *Service) UpdateSuspension(ctx context.Context, suspension *entity.Suspension) error {
+	ret := _m.Called(ctx, suspension)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *entity.Suspension) error); ok {
+		r0 = rf(ctx, suspension)
 	} else {
 		r0 = ret.Error(0)
 	}
