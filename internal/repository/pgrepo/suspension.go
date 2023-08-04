@@ -17,9 +17,10 @@ func (p *Postgres) NewSuspension(ctx context.Context, suspension *entity.Suspens
 			expires_in
 		)
 		VALUES ($1, $2, $3, $4)
+		RETURNING id
 	`, suspensionsTable)
 
-	_, err := p.Pool.Exec(ctx, query, suspension.Reason, suspension.UserID, suspension.ModeratorID, suspension.ExpiresIn)
+	err := p.Pool.QueryRow(ctx, query, suspension.Reason, suspension.UserID, suspension.ModeratorID, suspension.ExpiresIn).Scan(&suspension.ID)
 	if err != nil {
 		return err
 	}

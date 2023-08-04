@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"one-lab-final/internal/entity"
 	"one-lab-final/internal/handler/api"
@@ -32,16 +33,16 @@ func (h *Handler) suspendUser(ctx *gin.Context) {
 		return
 	}
 
-	userID := ctx.MustGet("userID").(int64)
 	ExpiresIn := time.Minute * time.Duration(req.ExpiresIn)
 
-	err = h.Services.NewSuspension(ctx, &entity.Suspension{
-		ID:          userID,
+	suspension := &entity.Suspension{
 		Reason:      &req.Reason,
 		UserID:      req.UserID,
-		ModeratorID: userID,
+		ModeratorID: ctx.MustGet("userID").(int64),
 		ExpiresIn:   &ExpiresIn,
-	})
+	}
+
+	err = h.Services.NewSuspension(ctx, suspension)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, &api.ErrorResponse{
 			Code:    http.StatusInternalServerError,
@@ -49,6 +50,8 @@ func (h *Handler) suspendUser(ctx *gin.Context) {
 		})
 		return
 	}
+
+	ctx.Header("Locations", fmt.Sprintf("/mod/suspensions/%d", suspension.ID))
 
 	ctx.JSON(http.StatusOK, &api.DefaultResponse{
 		Code:    http.StatusOK,
