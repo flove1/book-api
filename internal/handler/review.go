@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"one-lab-final/internal/entity"
 	"one-lab-final/internal/handler/api"
@@ -29,7 +28,6 @@ func (h *Handler) createReview(ctx *gin.Context) {
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		log.Printf("bind json err: %s \n", err.Error())
 		ctx.JSON(http.StatusBadRequest, &api.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: err.Error(),

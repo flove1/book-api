@@ -23,12 +23,6 @@ type DefaultResponse struct {
 	Message string `json:"message"`
 }
 
-type DefaultResponseWithBody struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Body    any    `json:"body"`
-}
-
 type ErrorResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`

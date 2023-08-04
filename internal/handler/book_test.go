@@ -32,7 +32,8 @@ func TestCreateBook(t *testing.T) {
 				"title": "Book title",
 				"author": "Great author",
 				"description": "Boring description",
-				"tags": ["tag1", "tag2", "tag3"]
+				"tags": ["tag1", "tag2", "tag3"],
+				"year": 1994
 			}`,
 			MockResult: nil,
 			ExpectedBook: entity.Book{
@@ -40,6 +41,7 @@ func TestCreateBook(t *testing.T) {
 				Author:      util.StringToPointer("Great author"),
 				Description: util.StringToPointer("Boring description"),
 				Tags:        &[]string{"tag1", "tag2", "tag3"},
+				Year:        1994,
 			},
 			ExpectedCode: http.StatusCreated,
 		},
@@ -50,7 +52,8 @@ func TestCreateBook(t *testing.T) {
 				"title": "Book title",
 				"author": "Great author",
 				"description": "Boring description",
-				"tags": [""]
+				"tags": [""],
+				"year": 1994
 			}`,
 			ExpectedCode: http.StatusBadRequest,
 		},
@@ -69,7 +72,8 @@ func TestCreateBook(t *testing.T) {
 				"title": "Book title",
 				"author": "Great author",
 				"description": "Boring description",
-				"tags": ["tag1", "tag2", "tag3"]
+				"tags": ["tag1", "tag2", "tag3"],
+				"year": 1994
 			}`,
 			MockResult: errors.New("critical error"),
 			ExpectedBook: entity.Book{
@@ -77,6 +81,7 @@ func TestCreateBook(t *testing.T) {
 				Author:      util.StringToPointer("Great author"),
 				Description: util.StringToPointer("Boring description"),
 				Tags:        &[]string{"tag1", "tag2", "tag3"},
+				Year:        1994,
 			},
 			ExpectedCode: http.StatusInternalServerError,
 		},

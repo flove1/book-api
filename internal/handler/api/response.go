@@ -11,6 +11,12 @@ type LoginResponse struct {
 	Body    *entity.Token `json:"body"`
 }
 
+type GetUserByUsernameResponse struct {
+	Code    int          `json:"code"`
+	Message string       `json:"message"`
+	Body    *entity.User `json:"body"`
+}
+
 type GetBookByIDResponse struct {
 	Code    int          `json:"code"`
 	Message string       `json:"message"`

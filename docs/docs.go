@@ -719,7 +719,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Ok",
                         "schema": {
-                            "$ref": "#/definitions/api.DefaultResponseWithBody"
+                            "$ref": "#/definitions/api.GetUserByUsernameResponse"
                         }
                     },
                     "400": {
@@ -863,18 +863,6 @@ const docTemplate = `{
                 }
             }
         },
-        "api.DefaultResponseWithBody": {
-            "type": "object",
-            "properties": {
-                "body": {},
-                "code": {
-                    "type": "integer"
-                },
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "api.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -937,6 +925,20 @@ const docTemplate = `{
                 },
                 "meta": {
                     "$ref": "#/definitions/util.Metadata"
+                }
+            }
+        },
+        "api.GetUserByUsernameResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "$ref": "#/definitions/entity.User"
+                },
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },
@@ -1085,6 +1087,19 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Role": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "USER",
+                "MODERATOR",
+                "ADMIN"
+            ]
+        },
         "entity.Token": {
             "type": "object",
             "properties": {
@@ -1092,6 +1107,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/entity.Role"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

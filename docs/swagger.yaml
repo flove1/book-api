@@ -91,14 +91,6 @@ definitions:
       message:
         type: string
     type: object
-  api.DefaultResponseWithBody:
-    properties:
-      body: {}
-      code:
-        type: integer
-      message:
-        type: string
-    type: object
   api.ErrorResponse:
     properties:
       code:
@@ -140,6 +132,15 @@ definitions:
         type: string
       meta:
         $ref: '#/definitions/util.Metadata'
+    type: object
+  api.GetUserByUsernameResponse:
+    properties:
+      body:
+        $ref: '#/definitions/entity.User'
+      code:
+        type: integer
+      message:
+        type: string
     type: object
   api.LoginRequest:
     properties:
@@ -243,11 +244,38 @@ definitions:
       user_id:
         type: integer
     type: object
+  entity.Role:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - USER
+    - MODERATOR
+    - ADMIN
   entity.Token:
     properties:
       expiry:
         type: string
       token:
+        type: string
+    type: object
+  entity.User:
+    properties:
+      created_at:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      role:
+        $ref: '#/definitions/entity.Role'
+      updated_at:
+        type: string
+      username:
         type: string
     type: object
   util.Metadata:
@@ -610,7 +638,7 @@ paths:
         "200":
           description: Ok
           schema:
-            $ref: '#/definitions/api.DefaultResponseWithBody'
+            $ref: '#/definitions/api.GetUserByUsernameResponse'
         "400":
           description: Bad Request
           schema:

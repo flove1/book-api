@@ -62,7 +62,7 @@ func (h *Handler) createUser(ctx *gin.Context) {
 // @Produce      json
 // @Param        username   path      string  true  "Username of user"
 //
-// @Success      200 {object} api.DefaultResponseWithBody "Ok"
+// @Success      200 {object} api.GetUserByUsernameResponse "Ok"
 // @Failure      400  {object}  api.ErrorResponse
 // @Failure      404  {object}  api.ErrorResponse
 // @Failure      500  {object}  api.ErrorResponse
@@ -97,7 +97,7 @@ func (h *Handler) getUserByUsername(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, &api.DefaultResponseWithBody{
+	ctx.JSON(http.StatusOK, &api.GetUserByUsernameResponse{
 		Code:    http.StatusOK,
 		Message: "ok",
 		Body:    user,

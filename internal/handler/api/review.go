@@ -5,7 +5,7 @@ import "one-lab-final/internal/entity"
 type CreateReviewRequest struct {
 	UserID  int64  `json:"-"`
 	Content string `json:"content" binding:"required" example:"Awesome book"`
-	Rating  int64  `json:"rating,default=0" binding:"required" example:"100" default:"0"`
+	Rating  int64  `json:"rating" binding:"required" example:"100" default:"0"`
 	BookID  int64  `json:"book_id" example:"1"`
 }
 
