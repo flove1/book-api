@@ -39,8 +39,9 @@ func (p *Postgres) GetBookByID(ctx context.Context, bookID int64) (*entity.Book,
 			b.description,
 			b.author,
 			b.tags,
+			b.year,
 			b.created_at,
-			b.updated_at
+			b.updated_at,
 			(SELECT rating FROM %[2]s r WHERE r.book_id = b.id)
 		FROM %[1]s b
 		WHERE 
@@ -55,6 +56,7 @@ func (p *Postgres) GetBookByID(ctx context.Context, bookID int64) (*entity.Book,
 		&book.Description,
 		&book.Author,
 		&book.Tags,
+		&book.Year,
 		&book.CreatedAt,
 		&book.UpdatedAt,
 		&book.Rating,

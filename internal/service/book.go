@@ -22,7 +22,8 @@ func (m *Manager) GetBooks(ctx context.Context, title *string, author *string, t
 		"rating",
 		"year",
 		"created_at",
-		"updated_at"}
+		"updated_at",
+	}
 
 	if !filter.ValidateSort(filterSafeList) {
 		return nil, nil, ErrInvalidSortValue

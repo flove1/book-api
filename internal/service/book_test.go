@@ -79,22 +79,6 @@ func TestGetBookByID(t *testing.T) {
 			}
 		})
 	}
-	repo := mocks.NewRepository(t)
-	service := New(repo, nil)
-	ctx := context.Background()
-
-	book := new(entity.Book)
-
-	repo.On("GetBookByID", ctx, int64(5)).Return(book, nil)
-	repo.On("GetBookByID", ctx, int64(42)).Return(nil, errors.New("some error"))
-
-	result, err := service.GetBookByID(ctx, 5)
-	assert.Equal(t, book, result)
-	assert.Nil(t, err)
-
-	result, err = service.GetBookByID(ctx, 42)
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
 }
 
 func TestGetBooks(t *testing.T) {
@@ -154,20 +138,32 @@ func TestGetBooks(t *testing.T) {
 }
 
 func TestDeleteBook(t *testing.T) {
-	repo := mocks.NewRepository(t)
-	service := New(repo, nil)
-	ctx := context.Background()
+	var bookID int64 = 5
+	tests := []struct {
+		Name       string
+		MockResult any
+	}{
+		{
+			Name:       "Book updated successfully",
+			MockResult: nil,
+		},
+		{
+			Name:       "Some error ocurred while updating",
+			MockResult: errors.New("critical error"),
+		},
+	}
 
-	var id int64 = 5
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			repo := mocks.NewRepository(t)
+			service := New(repo, nil)
+			ctx := context.Background()
 
-	repo.On("DeleteBook", ctx, id).Return(nil).Once()
-	repo.On("DeleteBook", ctx, id).Return(errors.New("some error")).Once()
+			repo.On("DeleteBook", ctx, bookID).Return(test.MockResult)
 
-	result := service.DeleteBook(ctx, id)
-	assert.Nil(t, result)
-
-	result = service.DeleteBook(ctx, id)
-	assert.NotNil(t, result)
+			assert.Equal(t, service.DeleteBook(ctx, bookID), test.MockResult)
+		})
+	}
 }
 
 func TestUpdateBook(t *testing.T) {

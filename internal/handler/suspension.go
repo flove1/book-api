@@ -53,8 +53,8 @@ func (h *Handler) suspendUser(ctx *gin.Context) {
 
 	ctx.Header("Locations", fmt.Sprintf("/mod/suspensions/%d", suspension.ID))
 
-	ctx.JSON(http.StatusOK, &api.DefaultResponse{
-		Code:    http.StatusOK,
+	ctx.JSON(http.StatusCreated, &api.DefaultResponse{
+		Code:    http.StatusCreated,
 		Message: "user was successfully suspended",
 	})
 }
