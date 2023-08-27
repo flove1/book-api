@@ -1,4 +1,4 @@
-API for Library application that supports reviews.
+API for review-aggregation service about books
 
 Application properties and admin's credentials are specified in config.yaml
 
