@@ -2,19 +2,33 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building..'
+                checkout scm
             }
         }
-        stage('Test') {
+
+        stage('Build and Run Docker Compose') {
             steps {
-                echo 'Testing..'
+                script {
+                    // Set Docker environment (if needed)
+                    docker.withServer('my-docker-host') {
+                        // Pull the latest images and start services
+                        sh 'docker-compose -f docker-compose.yml pull'
+                        sh 'docker-compose -f docker-compose.yml up -d'
+                    }
+                }
             }
         }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
+    }
+
+    post {
+        always {
+            // Clean up (stop and remove containers)
+            script {
+                docker.withServer('my-docker-host') {
+                    sh 'docker-compose -f docker-compose.yml down'
+                }
             }
         }
     }
