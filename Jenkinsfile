@@ -8,26 +8,32 @@ pipeline {
             }
         }
 
-        stage('Build and Run Docker Compose') {
+        stage('Build and Deploy') {
             steps {
                 script {
-                    // Set Docker environment (if needed)
-                    docker.withServer('my-docker-host') {
-                        // Pull the latest images and start services
-                        sh 'docker-compose -f docker-compose.yml pull'
-                        sh 'docker-compose -f docker-compose.yml up -d'
-                    }
+                    // Define the location of your Docker Compose file
+                    def composeFile = 'docker-compose.yml'
+
+                    // Make sure Docker is available on the Jenkins agent
+                    sh 'docker --version'
+
+                    // Run Docker Compose
+                    sh "docker-compose -f ${composeFile} up -d"
                 }
             }
         }
     }
 
     post {
-        always {
+        success {
             // Clean up (stop and remove containers)
             script {
                 docker.withServer('my-docker-host') {
-                    sh 'docker-compose -f docker-compose.yml down'
+                    // Define the location of your Docker Compose file
+                    def composeFile = 'docker-compose.yml'
+
+                    // Run Docker Compose
+                    sh "docker-compose -f ${composeFile} down"
                 }
             }
         }
