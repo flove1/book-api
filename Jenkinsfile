@@ -28,13 +28,11 @@ pipeline {
         success {
             // Clean up (stop and remove containers)
             script {
-                docker.withServer('my-docker-host') {
-                    // Define the location of your Docker Compose file
-                    def composeFile = 'docker-compose.yml'
+                // Define the location of your Docker Compose file
+                def composeFile = 'docker-compose.yml'
 
-                    // Run Docker Compose
-                    sh "docker-compose -f ${composeFile} down"
-                }
+                // Run Docker Compose
+                sh "docker-compose -f ${composeFile} down"
             }
         }
     }
