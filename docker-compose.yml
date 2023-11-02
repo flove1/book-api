@@ -2,7 +2,7 @@ version: '3'
 
 services:
   db:
-    image: postgres
+    image: postgres:15.4
     container_name: one_final_db
     restart: always
     ports:
@@ -15,6 +15,11 @@ services:
       - db-data:/var/lib/postgresql/data
     networks:
       - one_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
 
   migration:
     image: migrate/migrate
@@ -24,7 +29,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./migrations:/migrations
     networks:

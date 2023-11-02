@@ -17,7 +17,6 @@ func (h *Handler) InitRouter() *gin.Engine {
 
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(router)
-	ginprometheus.NewPrometheus("gin")
 
 	v1 := router.Group("/api/v1")
 

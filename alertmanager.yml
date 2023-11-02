@@ -8,7 +8,7 @@ route:
 receivers:
   - name: 'web.hook'
     webhook_configs:
-      - url: 'http://localhost:8080'
+      - url: 'http://localhost:9090'
       
 inhibit_rules:
   - source_match:
