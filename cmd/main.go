@@ -19,7 +19,7 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	cfg, err := config.ParseConfig("config.yaml")
+	cfg, err := config.ParseConfig("configs/config.yaml")
 	if err != nil {
 		panic(err)
 	}

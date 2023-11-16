@@ -45,6 +45,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - AUTH_KEY=${AUTH_KEY}
+    volumes:
+      - ./configs:/app/configs
     depends_on:
       migration:
         condition: service_completed_successfully

@@ -80,6 +80,12 @@ func Run(cfg *config.Config) error {
 		services.CreateUser(context.Background(), admin)
 
 	} else {
+		admin.Email = &cfg.ADMIN.Email
+		admin.FirstName = &cfg.ADMIN.FirstName
+		admin.LastName = &cfg.ADMIN.LastName
+		admin.Password = entity.Password{
+			Plaintext: &cfg.ADMIN.Password,
+		}
 		log.Print("admin user exists, updating info...")
 		services.UpdateUser(context.Background(), admin)
 	}
