@@ -50,10 +50,5 @@ func ParseConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
-	err = cleanenv.ReadEnv(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	return cfg, nil
 }
