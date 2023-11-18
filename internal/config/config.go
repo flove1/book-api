@@ -27,10 +27,10 @@ type AuthConfig struct {
 }
 
 type DBConfig struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	DBName   string `yaml:"db_name"`
-	Username string `yaml:"username"`
+	Host     string `env:"DB_HOST" env-required:"true"`
+	Port     string `env:"DB_PORT" env-required:"true"`
+	DBName   string `env:"DB_NAME" env-required:"true"`
+	Username string `env:"DB_USERNAME" env-required:"true"`
 	Password string `env:"DB_PASSWORD" env-required:"true"`
 }
 

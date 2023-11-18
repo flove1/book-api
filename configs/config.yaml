@@ -8,7 +8,7 @@ http:
 db:
   host: 'db'
   port: '5432'
-  db_name: 'one_final'
+  db_name: 'book-api-db'
   username: 'postgres'
 
 auth:
