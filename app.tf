@@ -32,10 +32,10 @@ resource "google_compute_firewall" "allow-postgres" {
 
   allow {
     protocol = "tcp"
-    ports    = ["5432"]  # Adjust the port if necessary
+    ports    = ["5432"]
   }
 
-  source_ranges = ["0.0.0.0/0"]  # Replace with a specific IP range for security
+  source_ranges = ["0.0.0.0/0"]
 }
 
 resource "google_compute_firewall" "allow-api" {
@@ -47,17 +47,17 @@ resource "google_compute_firewall" "allow-api" {
     ports    = ["8080"]
   }
 
-  source_ranges = ["0.0.0.0/0"]  # Replace with a specific IP range for security
+  source_ranges = ["0.0.0.0/0"]
 }
 
-resource "google_compute_firewall" "allow-prometheus" {
-  name    = "allow-prometheus"
+resource "google_compute_firewall" "allow-node-exporter" {
+  name    = "allow-node-exporter"
   network = "default"
 
   allow {
     protocol = "tcp"
-    ports    = ["9090"]
+    ports    = ["9100"]
   }
 
-  source_ranges = ["0.0.0.0/0"]  # Replace with a specific IP range for security
+  source_ranges = ["0.0.0.0/0"]
 }

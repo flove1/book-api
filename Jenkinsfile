@@ -8,17 +8,31 @@ pipeline {
             }
         }
 
-        stage('Build and Deploy') {
+        stage('Build and Test Go Project') {
             steps {
                 script {
-                    // Define the location of your Docker Compose file
-                    def composeFile = 'docker-compose.yml'
+                    sh 'go version'
+                    sh 'go get -v ./...'
+                    sh 'go test -v ./...'
+                }
+            }
+        }
 
-                    // Make sure Docker is available on the Jenkins agent
-                    sh 'docker --version'
+        stage('Test Docker Compose Configuration') {
+            steps {
+                script {
+                    sh 'docker-compose --version'
+                    sh 'docker-compose config -q'
+                }
+            }
+        }
 
-                    // Run Docker Compose
-                    sh "docker-compose -f ${composeFile} up -d"
+        stage('Deploy with Terraform') {
+            steps {
+                // Deploy infrastructure with Terraform
+                script {
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
                 }
             }
         }
@@ -26,14 +40,10 @@ pipeline {
 
     post {
         success {
-            // Clean up (stop and remove containers)
-            script {
-                // Define the location of your Docker Compose file
-                def composeFile = 'docker-compose.yml'
-
-                // Run Docker Compose
-                sh "docker-compose -f ${composeFile} down"
-            }
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
         }
     }
 }

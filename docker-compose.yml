@@ -1,24 +1,6 @@
 version: '3'
 
 services:
-  prometheus:
-    image: prom/prometheus
-    container_name: one_final_prometheus
-    ports:
-      - 9090:9090
-    volumes:
-      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
-
-  black-box:
-    image: quay.io/prometheus/blackbox-exporter:latest
-    container_name: one_final_black_box
-    command: "--config.file=/config/blackbox.yml"
-    ports:
-      - 9115:9115
-    volumes:
-      - ./configs/blackbox.yml:/config/blackbox.yml
-
-
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: one_final_node_exporter
