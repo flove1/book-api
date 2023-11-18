@@ -39,12 +39,24 @@ resource "google_compute_firewall" "allow-postgres" {
 }
 
 resource "google_compute_firewall" "allow-api" {
-  name    = "allow-8080"
+  name    = "allow-api"
   network = "default"
 
   allow {
     protocol = "tcp"
     ports    = ["8080"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]  # Replace with a specific IP range for security
+}
+
+resource "google_compute_firewall" "allow-prometheus" {
+  name    = "allow-prometheus"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["9090"]
   }
 
   source_ranges = ["0.0.0.0/0"]  # Replace with a specific IP range for security

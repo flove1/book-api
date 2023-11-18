@@ -37,7 +37,11 @@ services:
     container_name: one_final_migrate
     command: "-path=/migrations -database=postgresql://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable up"
     environment:
+      - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
     volumes:
       - ./migrations:/migrations
     networks:
