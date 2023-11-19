@@ -1,7 +1,7 @@
 resource "google_compute_instance" "app_instance" {
   name         = "book-api"
   machine_type = "n2-standard-2"
-  zone         = "asia-east2-a"
+  zone         = var.zone
 
   boot_disk {
     initialize_params {
