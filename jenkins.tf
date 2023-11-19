@@ -31,6 +31,7 @@ resource "google_compute_instance" "jenkins" {
     sudo apt-get install -y golang
     sudo apt-get install -y docker
     sudo apt-get install -y docker-compose
+    sudo apt-get install -y terraform
 
     # Start Jenkins service
     systemctl start jenkins
