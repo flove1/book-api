@@ -1,4 +1,8 @@
 terraform {
+  backend "gcs" {
+    bucket  = "book-api-terraform-state-bucket"
+    prefix  = "terraform/state-file.tfstate"
+  }
   required_providers {
     google = {
       source = "hashicorp/google"

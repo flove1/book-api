@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GCP_KEY_PATH = credentials('gcp-key')
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-key')
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     sh 'terraform init'
-                    sh 'terraform apply -auto-approve -var="gcp_key_path=$GCP_KEY_PATH"'
+                    sh 'terraform apply -auto-approve -var="gcp_key_path=$GOOGLE_APPLICATION_CREDENTIALS"'
                 }
             }
         }
