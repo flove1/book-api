@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        GCP_KEY_PATH = credentials('gcp-key')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -32,7 +36,7 @@ pipeline {
                 // Deploy infrastructure with Terraform
                 script {
                     sh 'terraform init'
-                    sh 'terraform apply -auto-approve'
+                    sh 'terraform apply -auto-approve -var="gcp_key_path=$GCP_KEY_PATH"'
                 }
             }
         }

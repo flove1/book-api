@@ -7,14 +7,6 @@ terraform {
   }
 }
 
-provider "google" {
-  credentials = file("gcd_key.json")
-
-  project = var.project_id
-  region  = var.region
-  zone    = var.zone
-}
-
 variable "region" {
   type    = string
   default = "asia-east2"
@@ -28,4 +20,16 @@ variable "zone" {
 variable "project_id" {
   type    = string
   default = "book-api-405216"
+}
+
+variable "gcp_key_path" {
+  description = "Path to the key file of GCP"
+}
+
+provider "google" {
+  credentials = file(var.gcp_key_path)
+
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
 }
